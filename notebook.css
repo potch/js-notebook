@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  line-height: 1.4;
+}
+
+#content {
+  margin: 1em;
+}
+
+.code {
+  border: 1px solid #ccc;
+}
+.code pre {
+  margin: 0;
+}
+.code .output {
+  padding: 1em;
+}
+
+.output .error {
+  color: red;
+}

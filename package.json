@@ -1,0 +1,29 @@
+{
+  "name": "js-notebook",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --progress --inline",
+    "watch": "onchange src/**/*.js -- npm run build",
+    "serve": "simple-server 8080",
+    "build": "webpack --progress"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "codemirror": "^5.21.0",
+    "d3": "^4.4.0",
+    "highlightjs": "^9.8.0",
+    "marked": "^0.3.6"
+  },
+  "devDependencies": {
+    "css-loader": "^0.26.1",
+    "onchange": "^3.2.0",
+    "raw-loader": "^0.5.1",
+    "simple-server": "^1.0.1",
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2"
+  },
+  "description": ""
+}
