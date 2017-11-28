@@ -4,6 +4,10 @@ function plotEnsure() {
   });
 }
 
+function identity(v) {
+  return v;
+}
+
 exports.plotBars = function plotBars(values) {
 
   var container = document.createElement('div');
@@ -34,7 +38,7 @@ exports.plotBars = function plotBars(values) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     x.domain(data.map(function (d, i) { return i; }));
-    y.domain([0, d3.max(data, function(d) { return d; })]);
+    y.domain([0, d3.max(data, identity)]);
 
     g.append("g")
         .attr("class", "axis axis--x")
@@ -65,7 +69,7 @@ exports.plotBars = function plotBars(values) {
   return container;
 }
 
-exports.plotLine = function plotLine() {
+exports.plotLine = function plotLine(values) {
 
   var container = document.createElement('div');
   container.classList.add('plot-container');
@@ -74,48 +78,62 @@ exports.plotLine = function plotLine() {
   container.appendChild(plot);
 
   plotEnsure().then(function () {
+    var d3 = require('d3');
 
+    var WID = 960;
+    var HGT = 540;
     var svg = d3.select(plot);
-    var margin = {top: 20, right: 20, bottom: 30, left: 50};
-    var width = +svg.attr("width") - margin.left - margin.right;
-    var height = +svg.attr("height") - margin.top - margin.bottom;
-    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var margin = {top: 20, right: 20, bottom: 30, left: 40};
+    svg.attr('viewBox', '0 0 ' + WID + ' ' + HGT);
+    svg.style('width', '100%');
+    svg.style('height', '400px');
+    var width = WID - margin.left - margin.right;
+    var height = HGT - margin.top - margin.bottom;
+    var data = values;
+
+    var g = svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var x = d3.scaleLinear().rangeRound([0, width]);
 
     var y = d3.scaleLinear().rangeRound([height, 0]);
 
-    x.domain(data.map(function (d, i) { return i; }));
-    y.domain([0, d3.max(data, function(d) { return d; })]);
+    x.domain([0, data,length]);
+    y.domain([
+      0,
+      d3.max(data, identity)
+    ]);
 
     var line = d3.line()
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.close); });
+      .x(function (d, i) { return x(i); })
+      .y(function (d) { return y(d); });
 
+    x.domain(d3.extent(data, function(_, i) { return i; }));
+    y.domain(d3.extent(data, identity));
 
-      x.domain(d3.extent(data, function(d) { return d.date; }));
-      y.domain(d3.extent(data, function(d) { return d.close; }));
+    g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
 
-      g.append("g")
-          .attr("class", "axis axis--x")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(x));
+    g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y))
+      .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .style("text-anchor", "end");
 
-      g.append("g")
-          .attr("class", "axis axis--y")
-          .call(d3.axisLeft(y))
-        .append("text")
-          .attr("fill", "#000")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", "0.71em")
-          .style("text-anchor", "end")
-          .text("Price ($)");
-
-      g.append("path")
-          .datum(data)
-          .attr("class", "line")
-          .attr("d", line);
+    g.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("fill", "none")
+      .attr("stroke", "#000")
+      .attr("d", line);
   });
 
+  return container;
 }
