@@ -2,6 +2,7 @@ var marked = require('marked');
 var CodeMirror = require('codemirror');
 var gfm = require('codemirror/mode/markdown/markdown');
 var continueList = require('codemirror/addon/edit/continuelist.js');
+var style = require('codemirror/lib/codemirror.css');
 
 var cm = CodeMirror(document.querySelector('#input'), {
   value: localStorage.getItem('saved-notebook') || "# New Notebook",
