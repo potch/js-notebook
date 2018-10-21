@@ -12,7 +12,7 @@ window.addEventListener('message', function (e) {
 });
 
 function $(selector) {
-  return Array.prototype.slice.apply(
+  return Array.from(
     document.querySelectorAll(selector)
   );
 }
@@ -46,13 +46,24 @@ function runFromTop(block) {
   var scripts = [];
   var currentBlock = block;
   var allCodeBlocks = $('.code');
+  var defsBlocks = $('.code.defs');
+  defsBlocks.forEach(def => {
+    scripts.unshift({
+      output: def.querySelector('.output'),
+      code: def.querySelector('code').innerText
+    });
+  });
   for (var i = 0; i < allCodeBlocks.length; i++) {
     var block = allCodeBlocks[i];
     var output = block.querySelector('.output');
-    scripts.push({
-      output: output,
-      code: block.querySelector('code').innerText
-    });
+    if (block.classList.contains('defs')) {
+      continue;
+    } else {
+      scripts.push({
+        output: output,
+        code: block.querySelector('code').innerText
+      });
+    }
     output.innerHTML = '';
     if (block === currentBlock) {
       break;

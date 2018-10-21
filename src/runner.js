@@ -35,7 +35,12 @@ exports.runScripts = function runScripts(libs, blocks) {
     switch(data.type) {
       case 'print':
         if (block) {
-          block.output.innerHTML += '<div>' + data.msg + '</div>';
+          console.log(data);
+          if (typeof data.msg === 'object') {
+            block.output.innerHTML += '<div>' + JSON.stringify(data.msg) + '</div>';
+          } else {
+            block.output.innerHTML += '<div>' + data.msg + '</div>';
+          }
         } else {
           console.log('print', data.msg);
         }

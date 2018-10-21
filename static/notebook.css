@@ -8,7 +8,9 @@ body {
 }
 
 #content {
-  margin: 1em;
+  margin: 1em auto;
+  max-width: 800px;
+  padding: 1em;
 }
 
 .code {
@@ -19,6 +21,16 @@ body {
 }
 .code .output {
   padding: 1em;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.code + p {
+  margin-top: 2em;
+}
+
+.output:empty {
+  display: none;
 }
 
 .output .error {

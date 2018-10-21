@@ -51,7 +51,6 @@
 	var style = __webpack_require__(7);
 
 	var cm = CodeMirror(document.querySelector('#input'), {
-	  value: localStorage.getItem('saved-notebook') || "# New Notebook",
 	  mode:  "markdown",
 	  tabSize: 2,
 	  lineNumbers: true,
@@ -107,7 +106,6 @@
 
 	function update() {
 	  var value = cm.getValue();
-	  localStorage.setItem('saved-notebook', value);
 	  marked(
 	    value,
 	    { renderer: literateRenderer },
@@ -134,7 +132,12 @@
 	  cm.refresh();
 	});
 
-	window.addEventListener('load', update);
+	window.addEventListener('DOMContentLoaded', function () {
+	  fetch('/notebook.md').then(r => r.text()).then(file => {
+	    cm.setValue(file);
+	    update();
+	  });
+	});
 
 
 /***/ },

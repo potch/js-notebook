@@ -4,7 +4,7 @@ module.exports = {
     notebook: './src/notebook.js'
   },
   output: {
-    filename: '[name].bundle.js'
+    filename: './static/[name].bundle.js'
   },
   module: {
     loaders: [

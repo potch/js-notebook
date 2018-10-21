@@ -58,7 +58,7 @@
 	});
 
 	function $(selector) {
-	  return Array.prototype.slice.apply(
+	  return Array.from(
 	    document.querySelectorAll(selector)
 	  );
 	}
@@ -92,13 +92,24 @@
 	  var scripts = [];
 	  var currentBlock = block;
 	  var allCodeBlocks = $('.code');
+	  var defsBlocks = $('.code.defs');
+	  defsBlocks.forEach(def => {
+	    scripts.unshift({
+	      output: def.querySelector('.output'),
+	      code: def.querySelector('code').innerText
+	    });
+	  });
 	  for (var i = 0; i < allCodeBlocks.length; i++) {
 	    var block = allCodeBlocks[i];
 	    var output = block.querySelector('.output');
-	    scripts.push({
-	      output: output,
-	      code: block.querySelector('code').innerText
-	    });
+	    if (block.classList.contains('defs')) {
+	      continue;
+	    } else {
+	      scripts.push({
+	        output: output,
+	        code: block.querySelector('code').innerText
+	      });
+	    }
 	    output.innerHTML = '';
 	    if (block === currentBlock) {
 	      break;
@@ -16069,7 +16080,12 @@
 	    switch(data.type) {
 	      case 'print':
 	        if (block) {
-	          block.output.innerHTML += '<div>' + data.msg + '</div>';
+	          console.log(data);
+	          if (typeof data.msg === 'object') {
+	            block.output.innerHTML += '<div>' + JSON.stringify(data.msg) + '</div>';
+	          } else {
+	            block.output.innerHTML += '<div>' + data.msg + '</div>';
+	          }
 	        } else {
 	          console.log('print', data.msg);
 	        }
@@ -16125,7 +16141,7 @@
 	  return v;
 	}
 
-	exports.plotBars = function plotBars(values) {
+	exports.plotBars = function plotBars(data) {
 
 	  var container = document.createElement('div');
 	  container.classList.add('plot-container');
@@ -16136,17 +16152,16 @@
 	  plotEnsure().then(function () {
 	    var d3 = __webpack_require__(15);
 
-	    var WID = 960;
-	    var HGT = 540;
+	    var WID = container.offsetWidth;
+	    var HGT = WID / 2;
 	    var svg = d3.select(plot);
 
 	    var margin = {top: 20, right: 20, bottom: 30, left: 40};
 	    svg.attr('viewBox', '0 0 ' + WID + ' ' + HGT);
-	    svg.style('width', '100%');
-	    svg.style('height', '400px');
+	    svg.style('width', WID);
+	    svg.style('height', HGT);
 	    var width = WID - margin.left - margin.right;
 	    var height = HGT - margin.top - margin.bottom;
-	    var data = values;
 
 	    var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
 	    var y = d3.scaleLinear().rangeRound([height, 0]);
@@ -16154,8 +16169,12 @@
 	    var g = svg.append("g")
 	        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	    x.domain(data.map(function (d, i) { return i; }));
-	    y.domain([0, d3.max(data, identity)]);
+	    x.domain(data.map(function (d) { return d[0] }));
+	    y.domain([0, d3.max(data, function (d) { return d[1] })]);
+
+	    console.log('plotty plot');
+
+	    console.log(d3.max(data, function (d) { return d[1] }));
 
 	    g.append("g")
 	        .attr("class", "axis axis--x")
@@ -16177,11 +16196,11 @@
 	      .enter().append("rect")
 	        .attr("class", "bar")
 	        .style("fill", "steelblue")
-	        .attr("x", function(d, i) { return x(i); })
-	        .attr("y", function(d) { return y(d); })
+	        .attr("x", function(d) { return x(d[0]); })
+	        .attr("y", function(d) { return y(d[1]); })
 	        .attr("width", x.bandwidth())
-	        .attr("height", function(d) { return height - y(d); });
-	  });
+	        .attr("height", function(d) { return height - y(d[1]); });
+	  }).catch(e => console.error(e));
 
 	  return container;
 	}
@@ -16204,7 +16223,7 @@
 	    var margin = {top: 20, right: 20, bottom: 30, left: 40};
 	    svg.attr('viewBox', '0 0 ' + WID + ' ' + HGT);
 	    svg.style('width', '100%');
-	    svg.style('height', '400px');
+	    svg.style('height', '30vh');
 	    var width = WID - margin.left - margin.right;
 	    var height = HGT - margin.top - margin.bottom;
 	    var data = values;
